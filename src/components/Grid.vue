@@ -122,6 +122,11 @@ function intializeGridWithCells(rows: number, columns: number) {
       console.log('updating destination...');
     }
 
+    if (updateSource || updateDestination) {
+      clearSearchAttributes(cell);
+      cell.isBarrier = false;
+    }
+
     mouseIsDown = false;
     updateSource = false;
     updateDestination = false;
