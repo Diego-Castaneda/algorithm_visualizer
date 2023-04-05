@@ -8,11 +8,49 @@ import AlgorithmSelect from "./AlgorithmSelect.vue"
 import GridOptions from "./GridOptions.vue"
 
 type Algorithm = 'Breath First Search' | 'Depth First Search' | 'A star'
+const DEFAULT_SEARCH_ALGORITHM = BFS;
 const stringToAlgorithmMap = new Map([['Breath First Search', BFS], ['Depth First Search', DFS]]);
-const getRandomInt = (min: number, max: number) => { return Math.floor(Math.random() * (max - min) + min); }
 
-const getRandomRowAndColumn = (min: number, maxRow: number, maxColumn: number) => {
-  return [getRandomInt(min, maxRow), getRandomInt(min, maxColumn)];
+let mouseIsDown = false;
+let updateSource = false;
+let updateDestination = false;
+
+const n = 64;
+const m = n;
+
+let searchAlgorithm = ref(DEFAULT_SEARCH_ALGORITHM);
+
+const grid: Cell[][] = reactive(intializeGridWithCells(n, m));
+console.log("grid initialized...");
+
+const source = ref<Cell>(grid[0][0]);
+const destination = ref<Cell>(grid[0][0]);
+initializeSourceAndDestination();
+console.log("source and destination initialized.");
+
+interface Position {
+  row: number;
+  column: number;
+};
+
+function initializeSourceAndDestination() {
+  const randomSource = getRandomRowAndColumn(0, n, m);
+  let randomDestination = getRandomRowAndColumn(0, n, m);
+  
+  while (randomDestination.row === randomSource.row && randomDestination.column === randomSource.column) {
+    randomDestination = getRandomRowAndColumn(0, n, m);
+  }
+
+  source.value = grid[randomSource.row][randomSource.column];
+  destination.value = grid[randomDestination.row][randomDestination.column];
+
+  source.value.isStart = true;
+  destination.value.isEnd = true;
+}
+
+function getRandomRowAndColumn (min: number, maxRow: number, maxColumn: number): Position {
+  const getRandomInt = (min: number, max: number) => { return Math.floor(Math.random() * (max - min) + min); };
+  return { row: getRandomInt(min, maxRow), column: getRandomInt(min, maxColumn) };
 }
 
 function intializeGridWithCells(rows: number, columns: number) {
@@ -37,62 +75,17 @@ function intializeGridWithCells(rows: number, columns: number) {
   return grid;
 }
 
-function getStartAndDestinationCells(grid: Cell[][]) {
-  const n : number = grid.length;
-  const m : number = grid[0].length;
-  const [startRow, startColumn] = getRandomRowAndColumn(0, n, m);
-  let [endRow, endColumn] = getRandomRowAndColumn(0, n, m);
-
-  while (startRow === endRow && startColumn === endColumn) {
-    [endRow, endColumn] = getRandomRowAndColumn(0, n, m);
-  }
-
-  return {start: grid[startRow][startColumn], destination: grid[endRow][endColumn]};
-}
-
-
-  const DEFAULT_SEARCH_ALGORITHM : Algorithm = 'Breath First Search'
-
-  const n = 64;
-  const m = n;
-
-  let searchAlgorithm = ref(stringToAlgorithmMap.get(DEFAULT_SEARCH_ALGORITHM));
-
-  const grid: Cell[][] = reactive(intializeGridWithCells(n, m));
-
-  // let {start, destination} = reactive(getStartAndDestinationCells(grid));
-  const result = getStartAndDestinationCells(grid);
-  let start = ref(result.start);
-  let destination = ref(result.destination);
-  start.value.isStart = true;
-  destination.value.isEnd = true;
-
-  // toRef(grid);
   function handleSearch() {
-    let algo = searchAlgorithm.value;
-    algo(grid, start.value, destination.value);
+    let algo = searchAlgorithm.value!;
+    algo(grid, source.value, destination.value);
   };
-
-  const handleCellClick = (event: Event, cell: Cell) => {
-      mouseDown(event, cell);
-      // console.log(`selected algo: ${selectedTarget}`)
-  };
-
-  let mouseIsDown = false;
-  let updateSource = false;
-  let updateDestination = false;
 
   function mouseDown (event: Event, cell: Cell) {
     event.preventDefault();
     mouseIsDown = true;
     if (cell.isStart || cell.isEnd) {
-      // event.currentTarget.classList.toggle("barrier");
-      if (cell.isStart) {
-        updateSource = true;
-      }
-      if (cell.isEnd) {
-        updateDestination = true;
-      }
+      updateSource = cell.isStart ? true : false;
+      updateDestination = cell.isEnd ? true : false;
     }
     else {
       cell.isBarrier = cell.isBarrier? false : true;
@@ -108,7 +101,6 @@ function getStartAndDestinationCells(grid: Cell[][]) {
 
   function mouseMove(event: Event, cell: Cell) {
     if (makeBarrierCell(cell)) {
-      // event.currentTarget.classList.toggle("barrier");
       cell.isBarrier = cell.isBarrier? false : true;
       lastRow = cell.row;
       lastColumn = cell.column;
@@ -118,9 +110,9 @@ function getStartAndDestinationCells(grid: Cell[][]) {
   function mouseUp(event: Event, cell: Cell) {
     console.log(`mouse released.`);
     if (updateSource) {
-      start.value.isStart = false;
-      start.value = cell;
-      start.value.isStart = true;
+      source.value.isStart = false;
+      source.value = cell;
+      source.value.isStart = true;
       console.log('updating source...');
     } 
     else if (updateDestination) {
@@ -135,36 +127,20 @@ function getStartAndDestinationCells(grid: Cell[][]) {
     updateDestination = false;
   };
 
-  function handleMouseOut() {
-    mouseIsDown = false;
-    console.log('mouseout');
+  function clearSearchAttributes(cell: Cell) {
+    cell.isQueued = false;
+    cell.isVisited = false;
   }
-
-
-  // function handleClearGrid(grid: Cell[][]) {
-  //   clearGrid(grid);
-  //   let result = getStartAndDestinationCells(grid);
-  //   start.value = result.start;
-  //   destination.value = result.destination;
-  //   start.value.isStart = true;
-  //   destination.value.isEnd = true;
-  // }
 
   function clearGrid() {
     console.log("clear grid");
     for (let i = 0; i < grid.length; i++) {
+      // let isSource = grid[i][j].isStart;
+      // let isDestination = grid[i][j].isEnd;
       for (let j = 0; j < grid[i].length; j++) {
-        grid[i][j] = {
-        id: `${i},${j}`, 
-        row: i,
-        column: j,
-        isVisited: false,
-        isQueued: false,
-        isCell: true,
-        isStart: false,
-        isEnd: false,
-        isBarrier: false
-        };
+        const cell = grid[i][j];
+        clearSearchAttributes(cell);
+        cell.isBarrier = false;
       }
     }
   }
@@ -174,9 +150,7 @@ function getStartAndDestinationCells(grid: Cell[][]) {
     console.log('resetting search...')
     for (let i = 0; i < grid.length; i++) {
       for (let j = 0; j < grid[0].length; j++) {
-        const cell = grid[i][j];
-        cell.isQueued = false;
-        cell.isVisited = false;
+        clearSearchAttributes(grid[i][j]);
       }
     }
   }
@@ -190,15 +164,13 @@ function getStartAndDestinationCells(grid: Cell[][]) {
 
 <template>
   <div class="container">
-    <div class="about">
-      <h1> About Me </h1>
-    </div>
+    <div class="about"> About Me </div>
     <div class="grid-wrapper">
       <div class="grid">
         <div v-for="(row, rowIndex) in grid" :key="rowIndex" class="row">
           <div v-for="(cell, colIndex) in row" :key="colIndex" 
           :class="{cell: true, start: cell.isStart, end: cell.isEnd, barrier: cell.isBarrier, queued: cell.isQueued, visited: cell.isVisited}"
-          @mousedown="handleCellClick($event, cell)"
+          @mousedown="mouseDown($event, cell)"
           @mousemove="mouseMove($event, cell)"
           @mouseup=" mouseUp($event, cell)">{{ }}</div>
         </div>
@@ -216,15 +188,6 @@ function getStartAndDestinationCells(grid: Cell[][]) {
 
 <style scoped>
 
-.container {
-  display: flex;
-  width: 100%;
-  height: 80%;
-  position: relative;
-  left: 0%;
-  top: 10%;
-}
-
 .about {
   flex-grow: 1;
   width: 20%;
@@ -234,6 +197,15 @@ function getStartAndDestinationCells(grid: Cell[][]) {
   border-right: black 1px solid;
   visibility: hidden;
 }
+.container {
+  display: flex;
+  width: 100%;
+  height: 80%;
+  position: relative;
+  left: 0%;
+  top: 10%;
+}
+
 .grid-wrapper {
   display: grid;
   background-color: #faaa93;

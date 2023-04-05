@@ -4,15 +4,15 @@
     const gridOptions = ["Squares", "Hexagons", "Circles", "64x64"];
 
     function resetSearch() {
-        emit('resetSearch');
+      emit('resetSearch');
     }
 
     function search() {
-        emit('search');
+      emit('search');
     }
 
     function clearGrid() {
-        emit('clearGrid');
+      emit('clearGrid');
     }
 </script>
 
@@ -22,7 +22,7 @@
         <div v-for="option in gridOptions" class="grid-option"> {{ option }} </div>
         <button @click="search()"> Search </button>
         <button @click="resetSearch()"> Reset Search </button>
-        <button @clicck="clearGrid()"> Clear Grid </button>
+        <button @click="clearGrid()"> Clear Grid </button>
     </div>
 </template>
 <style>
