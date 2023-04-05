@@ -1,5 +1,5 @@
 
-<script lang="ts">
+<script lang="ts" setup>
 
 import { defineComponent, reactive, ref, toRef } from 'vue';
 import { BFS, DFS } from "./../SearchAlgorithms";
@@ -50,157 +50,141 @@ function getStartAndDestinationCells(grid: Cell[][]) {
   return {start: grid[startRow][startColumn], destination: grid[endRow][endColumn]};
 }
 
-// function handleSearch(event, grid: Cell[][], start: Cell, destination: Cell, algorithm: Algorithm) {
-//   // BFS(grid, start, destination);
-//   algorithm(grid, start, destination);
-// }
 
-export default defineComponent({
-    // TODO: Color searched cells based on the distance from the start node. Find some need gradient range.
-    components: {
-      AlgorithmSelect,
-      GridOptions
-    },
-    setup() {
-      const DEFAULT_SEARCH_ALGORITHM : Algorithm = 'Breath First Search'
+  const DEFAULT_SEARCH_ALGORITHM : Algorithm = 'Breath First Search'
 
-      const n = 64;
-      const m = n;
+  const n = 64;
+  const m = n;
 
-      let searchAlgorithm = ref(stringToAlgorithmMap.get(DEFAULT_SEARCH_ALGORITHM));
+  let searchAlgorithm = ref(stringToAlgorithmMap.get(DEFAULT_SEARCH_ALGORITHM));
 
-      const grid: Cell[][] = reactive(intializeGridWithCells(n, m));
+  const grid: Cell[][] = reactive(intializeGridWithCells(n, m));
 
-      // let {start, destination} = reactive(getStartAndDestinationCells(grid));
-      const result = getStartAndDestinationCells(grid);
-      let start = ref(result.start);
-      let destination = ref(result.destination);
-      start.value.isStart = true;
-      destination.value.isEnd = true;
+  // let {start, destination} = reactive(getStartAndDestinationCells(grid));
+  const result = getStartAndDestinationCells(grid);
+  let start = ref(result.start);
+  let destination = ref(result.destination);
+  start.value.isStart = true;
+  destination.value.isEnd = true;
 
-      // toRef(grid);
-      function handleSearch() {
-        let algo = searchAlgorithm.value;
-        algo(grid, start.value, destination.value);
-      };
+  // toRef(grid);
+  function handleSearch() {
+    let algo = searchAlgorithm.value;
+    algo(grid, start.value, destination.value);
+  };
 
-      const handleCellClick = (event: Event, cell: Cell) => {
-          mouseDown(event, cell);
-          // console.log(`selected algo: ${selectedTarget}`)
-      };
+  const handleCellClick = (event: Event, cell: Cell) => {
+      mouseDown(event, cell);
+      // console.log(`selected algo: ${selectedTarget}`)
+  };
 
-      let mouseIsDown = false;
-      let updateSource = false;
-      let updateDestination = false;
+  let mouseIsDown = false;
+  let updateSource = false;
+  let updateDestination = false;
 
-      function mouseDown (event: Event, cell: Cell) {
-        event.preventDefault();
-        mouseIsDown = true;
-        if (cell.isStart || cell.isEnd) {
-          // event.currentTarget.classList.toggle("barrier");
-          if (cell.isStart) {
-            updateSource = true;
-          }
-          if (cell.isEnd) {
-            updateDestination = true;
-          }
-        }
-        else {
-          cell.isBarrier = cell.isBarrier? false : true;
-        }
-      };
-
-      let lastRow: number = -1;
-      let lastColumn: number = -1;
-      
-      function makeBarrierCell(cell: Cell) {
-        return mouseIsDown && !(cell.row === lastRow && cell.column === lastColumn) && (!cell.isStart && !cell.isEnd) && !updateSource && !updateDestination;
-      };
-
-      function mouseMove(event: Event, cell: Cell) {
-        if (makeBarrierCell(cell)) {
-          // event.currentTarget.classList.toggle("barrier");
-          cell.isBarrier = cell.isBarrier? false : true;
-          lastRow = cell.row;
-          lastColumn = cell.column;
-        }
-      };
-
-      function mouseUp(event: Event, cell: Cell) {
-        console.log(`mouse released.`);
-        if (updateSource) {
-          start.value.isStart = false;
-          start.value = cell;
-          start.value.isStart = true;
-          console.log('updating source...');
-        } 
-        else if (updateDestination) {
-          destination.value.isEnd = false;
-          destination.value = cell;
-          destination.value.isEnd = true;
-          console.log('updating destination...');
-        }
-
-        mouseIsDown = false;
-        updateSource = false;
-        updateDestination = false;
-      };
-
-      function handleMouseOut() {
-        mouseIsDown = false;
-        console.log('mouseout');
+  function mouseDown (event: Event, cell: Cell) {
+    event.preventDefault();
+    mouseIsDown = true;
+    if (cell.isStart || cell.isEnd) {
+      // event.currentTarget.classList.toggle("barrier");
+      if (cell.isStart) {
+        updateSource = true;
       }
-
-
-      // function handleClearGrid(grid: Cell[][]) {
-      //   clearGrid(grid);
-      //   let result = getStartAndDestinationCells(grid);
-      //   start.value = result.start;
-      //   destination.value = result.destination;
-      //   start.value.isStart = true;
-      //   destination.value.isEnd = true;
-      // }
-
-      function clearGrid() {
-        console.log("clear grid");
-        for (let i = 0; i < grid.length; i++) {
-          for (let j = 0; j < grid[i].length; j++) {
-            grid[i][j] = {
-            id: `${i},${j}`, 
-            row: i,
-            column: j,
-            isVisited: false,
-            isQueued: false,
-            isCell: true,
-            isStart: false,
-            isEnd: false,
-            isBarrier: false
-            };
-          }
-        }
+      if (cell.isEnd) {
+        updateDestination = true;
       }
-
-      function resetSearch() {
-        clearTimeout(undefined);
-        console.log('resetting search...')
-        for (let i = 0; i < grid.length; i++) {
-          for (let j = 0; j < grid[0].length; j++) {
-            const cell = grid[i][j];
-            // cell.isBarrier = false;
-            cell.isQueued = false;
-            cell.isVisited = false;
-          }
-        }
-      }
-
-      function changeAlgorithm(algorithm: Algorithm) {
-        console.log(`Changing algorithm to: ${algorithm}`);
-        searchAlgorithm.value = stringToAlgorithmMap.get(algorithm);
-      }
-
-      return { grid, start, destination, searchAlgorithm, resetSearch, changeAlgorithm, handleCellClick, mouseMove, mouseUp, handleMouseOut, clearGrid, handleSearch};
     }
-});
+    else {
+      cell.isBarrier = cell.isBarrier? false : true;
+    }
+  };
+
+  let lastRow: number = -1;
+  let lastColumn: number = -1;
+  
+  function makeBarrierCell(cell: Cell) {
+    return mouseIsDown && !(cell.row === lastRow && cell.column === lastColumn) && (!cell.isStart && !cell.isEnd) && !updateSource && !updateDestination;
+  };
+
+  function mouseMove(event: Event, cell: Cell) {
+    if (makeBarrierCell(cell)) {
+      // event.currentTarget.classList.toggle("barrier");
+      cell.isBarrier = cell.isBarrier? false : true;
+      lastRow = cell.row;
+      lastColumn = cell.column;
+    }
+  };
+
+  function mouseUp(event: Event, cell: Cell) {
+    console.log(`mouse released.`);
+    if (updateSource) {
+      start.value.isStart = false;
+      start.value = cell;
+      start.value.isStart = true;
+      console.log('updating source...');
+    } 
+    else if (updateDestination) {
+      destination.value.isEnd = false;
+      destination.value = cell;
+      destination.value.isEnd = true;
+      console.log('updating destination...');
+    }
+
+    mouseIsDown = false;
+    updateSource = false;
+    updateDestination = false;
+  };
+
+  function handleMouseOut() {
+    mouseIsDown = false;
+    console.log('mouseout');
+  }
+
+
+  // function handleClearGrid(grid: Cell[][]) {
+  //   clearGrid(grid);
+  //   let result = getStartAndDestinationCells(grid);
+  //   start.value = result.start;
+  //   destination.value = result.destination;
+  //   start.value.isStart = true;
+  //   destination.value.isEnd = true;
+  // }
+
+  function clearGrid() {
+    console.log("clear grid");
+    for (let i = 0; i < grid.length; i++) {
+      for (let j = 0; j < grid[i].length; j++) {
+        grid[i][j] = {
+        id: `${i},${j}`, 
+        row: i,
+        column: j,
+        isVisited: false,
+        isQueued: false,
+        isCell: true,
+        isStart: false,
+        isEnd: false,
+        isBarrier: false
+        };
+      }
+    }
+  }
+
+  function resetSearch() {
+    clearTimeout(undefined);
+    console.log('resetting search...')
+    for (let i = 0; i < grid.length; i++) {
+      for (let j = 0; j < grid[0].length; j++) {
+        const cell = grid[i][j];
+        cell.isQueued = false;
+        cell.isVisited = false;
+      }
+    }
+  }
+
+  function changeAlgorithm(algorithm: Algorithm) {
+    console.log(`Changing algorithm to: ${algorithm}`);
+    searchAlgorithm.value = stringToAlgorithmMap.get(algorithm);
+  }
 
 </script>
 
