@@ -2,6 +2,12 @@
     
     const emit = defineEmits(['resetSearch', 'search', 'clearGrid'])
     const gridOptions = ["Squares", "Hexagons", "Circles", "64x64"];
+    let keepBarriers = false;
+
+    function updateKeepBarriersFlag(event: Event) {
+      if (event.currentTarget)
+        keepBarriers = event.currentTarget.checked;
+    }
 
     function resetSearch() {
       emit('resetSearch');
@@ -12,7 +18,7 @@
     }
 
     function clearGrid() {
-      emit('clearGrid');
+      emit('clearGrid', keepBarriers);
     }
 </script>
 
@@ -22,7 +28,11 @@
         <div v-for="option in gridOptions" class="grid-option"> {{ option }} </div>
         <button @click="search()"> Search </button>
         <button @click="resetSearch()"> Reset Search </button>
-        <button @click="clearGrid()"> Clear Grid </button>
+        <div class="grid-option">
+          <button @click="clearGrid()"> Clear Grid </button>
+          <input type="checkbox" id="keepBarriers" @change="updateKeepBarriersFlag($event)">
+          <label for="keepBarriers">Keep Barriers</label>
+        </div>
     </div>
 </template>
 <style>
@@ -45,6 +55,7 @@
 
 .grid-option {
   color: #faaa93;
+  padding: 2px;
 }
 
 h1 {

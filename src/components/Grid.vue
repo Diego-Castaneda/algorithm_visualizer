@@ -137,15 +137,14 @@ function intializeGridWithCells(rows: number, columns: number) {
     cell.isVisited = false;
   }
 
-  function clearGrid() {
-    console.log("clear grid");
+  function clearGrid(keepBarriers: boolean) {
+    console.log(`clear grid, keep barriers: ${keepBarriers}`);
     for (let i = 0; i < grid.length; i++) {
-      // let isSource = grid[i][j].isStart;
-      // let isDestination = grid[i][j].isEnd;
       for (let j = 0; j < grid[i].length; j++) {
         const cell = grid[i][j];
         clearSearchAttributes(cell);
-        cell.isBarrier = false;
+        if (!keepBarriers) 
+          cell.isBarrier = false;
       }
     }
   }
@@ -186,7 +185,7 @@ function intializeGridWithCells(rows: number, columns: number) {
       <GridOptions 
       @search="handleSearch()" 
       @resetSearch="resetSearch()" 
-      @clearGrid="clearGrid()"></GridOptions>
+      @clearGrid="clearGrid"></GridOptions>
     </div>
   </div>
 </template>
