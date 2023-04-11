@@ -168,7 +168,6 @@ function intializeGridWithCells(rows: number, columns: number) {
 
 <template>
   <div class="container">
-    <div class="about"> About Me </div>
     <div class="grid-wrapper">
       <div class="grid">
         <div v-for="(row, rowIndex) in grid" :key="rowIndex" class="row">
@@ -191,16 +190,6 @@ function intializeGridWithCells(rows: number, columns: number) {
 </template>
 
 <style scoped>
-
-.about {
-  flex-grow: 1;
-  width: 20%;
-  margin-left: 1%;
-  margin-right: 1%;
-  border-left: black 1px solid;
-  border-right: black 1px solid;
-  visibility: hidden;
-}
 .container {
   display: flex;
   width: 100%;
