@@ -41,7 +41,9 @@ import TheSidebar from "./components/TheSidebar.vue"
 .sidebar {
   border: black 1px solid;
   grid-column: 1 / span 1;
-  background-color: #eee;
+  border-radius: 1em;
+  border: #646cffaa 8px solid;
+  /* background-color: #eee; */
 }
 
 .content {
