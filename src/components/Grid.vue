@@ -193,16 +193,15 @@ function intializeGridWithCells(rows: number, columns: number) {
 .container {
   display: flex;
   width: 100%;
-  height: 80%;
-  position: relative;
-  left: 0%;
-  top: 10%;
+  height: 95%;
+  position: absolute;
+  padding-top: 5px;
 }
 
 .grid-wrapper {
   display: grid;
   background-color: #faaa93;
-  height: 100%; 
+  /* height: 100%;  */
   width: 40%;
   flex-grow: 1;
   border: #646cffaa 8px solid;
@@ -218,9 +217,9 @@ function intializeGridWithCells(rows: number, columns: number) {
 
 .options-pane {
   display: flex;
-  flex-grow: 1;
+  /* flex-grow: 1; */
   flex-direction: column;
-  height: 100%; 
+  height: 80%; 
   width: 20%;
   padding-left: 1%;
   padding-right: 1%;
