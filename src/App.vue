@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
 import Grid from './components/Grid.vue'
-import AlgorithmSelect from './components/AlgorithmSelect.vue'
 import TheSidebar from "./components/TheSidebar.vue"
 
 </script>
@@ -15,7 +13,6 @@ import TheSidebar from "./components/TheSidebar.vue"
     <div class="content"> 
       <Grid/> 
     </div>
-
   </div>
 </template>
 
@@ -49,10 +46,5 @@ import TheSidebar from "./components/TheSidebar.vue"
 
 .content {
   grid-column: 2 / span 1;
-}
-
-.canvas {
-  flex-grow: 1;
-  position: absolute;
 }
 </style>
