@@ -194,7 +194,7 @@ function intializeGridWithCells(rows: number, columns: number) {
   display: flex;
   width: 100%;
   height: 95%;
-  position: absolute;
+  position: relative;
   padding-top: 5px;
 }
 
