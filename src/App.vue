@@ -2,18 +2,15 @@
 import HelloWorld from './components/HelloWorld.vue'
 import Grid from './components/Grid.vue'
 import AlgorithmSelect from './components/AlgorithmSelect.vue'
+import TheSidebar from "./components/TheSidebar.vue"
+
 </script>
 
 <template>
   <div class="app-grid-container">
     <div class="header"> The Header </div>
     <div class="sidebar"> 
-      <ul>
-        <li> Grid </li>
-        <li> Graph </li>
-        <li> Linked List </li>
-        <li> Stacks </li>
-      </ul>
+      <TheSidebar/>
     </div>
     <div class="content"> 
       <Grid/> 
