@@ -201,7 +201,6 @@ function intializeGridWithCells(rows: number, columns: number) {
 .grid-wrapper {
   display: grid;
   background-color: #faaa93;
-  /* height: 100%;  */
   width: 40%;
   flex-grow: 1;
   border: #646cffaa 8px solid;
@@ -210,14 +209,11 @@ function intializeGridWithCells(rows: number, columns: number) {
 .grid {
   display: grid;
   background-color: #faaa93;
-  /* height: 100%; 
-  width: 40%; */
   flex-grow: 1;
 }
 
 .options-pane {
   display: flex;
-  /* flex-grow: 1; */
   flex-direction: column;
   height: 80%; 
   width: 20%;
@@ -225,17 +221,9 @@ function intializeGridWithCells(rows: number, columns: number) {
   padding-right: 1%;
 }
 
-/* .grid-options button {
-  width: 100px;
-} */
-
 h1 {
   color: #74A892;
   font-family: monospace;
-}
-
-.inputs{
-  outline: black 1px solid;
 }
 
 .row {
@@ -280,12 +268,5 @@ h1 {
 
 .cell:hover {
   filter: drop-shadow(0 0 0.5em #646cffaa);
-}
-
-.read-the-docs {
-  color: #888;
-}
-.canvas {
-  outline: black 3px solid;
 }
 </style>
