@@ -29,27 +29,19 @@ class SquareGrid {
     }
 }
 
-async function setVisitedWithTimeout (cell: Cell, val: boolean) {
-    await new Promise<void>(resolve => {
-        setTimeout(() => {
-            cell.isVisited = val; //
-            resolve();
-        }, 10);
-    });
-};
+interface CellStateTransition {
+    cell: Cell;
+    next: {
+        isVisited: boolean,
+        isQueued: boolean,
+    }
+}
 
-async function setQueuedWithTimeout (cell: Cell, val: boolean) {
-    await new Promise<void>(resolve => {
-        setTimeout(() => {
-            cell.isQueued = val;
-            resolve();
-        }, 10);
-    });
-};
+const isSamePosition = (n1: Cell, n2: Cell) => { return n1.row === n2.row &&  n1.column == n2.column };
 
-const isSamePosition = (n1: Cell, n2: Cell) => { return n1.row === n2.row &&  n1.column == n2.column};
-const refresMilliseconds = .0001;
 export function BFS(grid: Cell[][], start: Cell, destination: Cell) {
+    const stepQueue = []
+    let stepTransitions = [];
     console.log("start BFS...");
 
     let queue: Cell[] = [start];
@@ -63,8 +55,12 @@ export function BFS(grid: Cell[][], start: Cell, destination: Cell) {
         visited.add(current.id);
 
         if (!isSamePosition(current, start) && !isSamePosition(current, destination)) {
-            setVisitedWithTimeout(current, true);
-            setQueuedWithTimeout(current, false);
+
+            stepTransitions.push(
+            {
+                cell: current, 
+                next: { isVisited: true, isQueued: false }
+            });
         }
 
         for (let neighbor of SquareGrid.getNeighbors(grid, current)) {
@@ -77,11 +73,21 @@ export function BFS(grid: Cell[][], start: Cell, destination: Cell) {
             }
 
             queue.push(neighbor);
-            setQueuedWithTimeout(neighbor, true);
+            stepTransitions.push(
+                {
+                    cell: neighbor,
+                    next: { isVisited: neighbor.isVisited, isQueued: true }
+                }
+            )
             visited.add(neighbor.id)
         }
+
+        stepQueue.push(stepTransitions);
+        stepTransitions = [];
     }
     console.log("finished BFS.");
+
+    return stepQueue;
 }
 
 /**
@@ -99,15 +105,10 @@ function shuffle(a) {
     return a;
 }
 
-function setVisited(cell: Cell) {
-    cell.isVisited = true;
-}
-
-function setQueued(cell: Cell, val: boolean) {
-    cell.isQueued = val;
-}
-
 export function DFS(grid: Cell[][], start: Cell, destination: Cell) {
+    const stepQueue = []
+    let stepTransitions = [];
+
     function DFSHelper(current: Cell, discovered: Set<string>) {
 
         for (let nei of shuffle(SquareGrid.getNeighbors(grid, current))) {
@@ -118,16 +119,24 @@ export function DFS(grid: Cell[][], start: Cell, destination: Cell) {
                 return true;
 
             discovered.add(nei.id);
-            setTimeout(setVisited, refresMilliseconds * counter++, nei);
+            stepTransitions.push({
+                cell: nei,
+                next: { isVisited: true, isQueued: nei.isQueued }
+            });
+
             if (DFSHelper(nei, discovered)) {
                 return true;
             };
         }
+
+        stepQueue.push(stepTransitions);
+        stepTransitions = [];
     }
 
     let discovered: Set<string> = new Set();
     discovered.add(start.id);
-    let counter = 0;
 
     DFSHelper(start, discovered);
+
+    return stepQueue;
 }

@@ -75,94 +75,140 @@ function intializeGridWithCells(rows: number, columns: number) {
   return grid;
 }
 
-  function handleSearch() {
-    let algo = searchAlgorithm.value!;
-    algo(grid, source.value, destination.value);
-  };
 
-  function mouseDown (event: Event, cell: Cell) {
-    event.preventDefault();
-    mouseIsDown = true;
-    if (cell.isStart || cell.isEnd) {
-      updateSource = cell.isStart ? true : false;
-      updateDestination = cell.isEnd ? true : false;
-    }
-    else {
-      cell.isBarrier = cell.isBarrier? false : true;
-    }
-  };
+// Code adapted from https://stackoverflow.com/questions/19764018/controlling-fps-with-requestanimationframe
+let stopAnimating = false;
+let startTime, now, then, elapsed, fps, fpsInterval, steps, currentStep, lastStep;
 
-  let lastRow: number = -1;
-  let lastColumn: number = -1;
-  
-  function makeBarrierCell(cell: Cell) {
-    return mouseIsDown && !(cell.row === lastRow && cell.column === lastColumn) && (!cell.isStart && !cell.isEnd) && !updateSource && !updateDestination;
-  };
 
-  function mouseMove(event: Event, cell: Cell) {
-    if (makeBarrierCell(cell)) {
-      cell.isBarrier = cell.isBarrier? false : true;
-      lastRow = cell.row;
-      lastColumn = cell.column;
-    }
-  };
+function startSearchAnimation(steps, fps) {
+  stopAnimating = false;
+  currentStep = 0;
+  lastStep = steps.length - 1;
 
-  function mouseUp(event: Event, cell: Cell) {
-    console.log(`mouse released.`);
-    if (updateSource) {
-      source.value.isStart = false;
-      source.value = cell;
-      source.value.isStart = true;
-      console.log('updating source...');
-    } 
-    else if (updateDestination) {
-      destination.value.isEnd = false;
-      destination.value = cell;
-      destination.value.isEnd = true;
-      console.log('updating destination...');
+  fpsInterval = 1000 / fps;
+  then = window.performance.now();
+  startTime = then;
+  animate();
+}
+
+function animate(newTime) {
+  if (stopAnimating) {
+    return;
+  }
+
+  requestAnimationFrame(animate);
+  now = newTime;
+  elapsed = now - then;
+
+  if (elapsed > fpsInterval) {
+    then = now - (elapsed % fpsInterval);
+    
+    const cellTransitions = steps[currentStep];
+    for (const {cell, next} of cellTransitions) {
+      cell.isVisited = next.isVisited;
+      cell.isQueued = next.isQueued;
     }
 
-    if (updateSource || updateDestination) {
+    console.log(`current step: ${currentStep}`);
+    if (currentStep === lastStep) {
+      stopAnimating = true;
+    }
+    currentStep += 1;
+  }
+}
+
+function handleSearch() {
+  let algo = searchAlgorithm.value!;
+  steps = algo(grid, source.value, destination.value);
+  startSearchAnimation(steps, 50);
+};
+
+function mouseDown (event: Event, cell: Cell) {
+  event.preventDefault();
+  mouseIsDown = true;
+  if (cell.isStart || cell.isEnd) {
+    updateSource = cell.isStart ? true : false;
+    updateDestination = cell.isEnd ? true : false;
+  }
+  else {
+    cell.isBarrier = cell.isBarrier? false : true;
+  }
+};
+
+let lastRow: number = -1;
+let lastColumn: number = -1;
+
+function makeBarrierCell(cell: Cell) {
+  return mouseIsDown && !(cell.row === lastRow && cell.column === lastColumn) && (!cell.isStart && !cell.isEnd) && !updateSource && !updateDestination;
+};
+
+function mouseMove(event: Event, cell: Cell) {
+  if (makeBarrierCell(cell)) {
+    cell.isBarrier = cell.isBarrier? false : true;
+    lastRow = cell.row;
+    lastColumn = cell.column;
+  }
+};
+
+function mouseUp(event: Event, cell: Cell) {
+  console.log(`mouse released.`);
+  if (updateSource) {
+    source.value.isStart = false;
+    source.value = cell;
+    source.value.isStart = true;
+    console.log('updating source...');
+  } 
+  else if (updateDestination) {
+    destination.value.isEnd = false;
+    destination.value = cell;
+    destination.value.isEnd = true;
+    console.log('updating destination...');
+  }
+
+  if (updateSource || updateDestination) {
+    clearSearchAttributes(cell);
+    cell.isBarrier = false;
+  }
+
+  mouseIsDown = false;
+  updateSource = false;
+  updateDestination = false;
+};
+
+function clearSearchAttributes(cell: Cell) {
+  cell.isQueued = false;
+  cell.isVisited = false;
+}
+
+function clearGrid(keepBarriers: boolean) {
+  stopAnimating = true;
+  console.log(`clear grid, keep barriers: ${keepBarriers}`);
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      const cell = grid[i][j];
       clearSearchAttributes(cell);
-      cell.isBarrier = false;
-    }
-
-    mouseIsDown = false;
-    updateSource = false;
-    updateDestination = false;
-  };
-
-  function clearSearchAttributes(cell: Cell) {
-    cell.isQueued = false;
-    cell.isVisited = false;
-  }
-
-  function clearGrid(keepBarriers: boolean) {
-    console.log(`clear grid, keep barriers: ${keepBarriers}`);
-    for (let i = 0; i < grid.length; i++) {
-      for (let j = 0; j < grid[i].length; j++) {
-        const cell = grid[i][j];
-        clearSearchAttributes(cell);
-        if (!keepBarriers) 
-          cell.isBarrier = false;
-      }
+      if (!keepBarriers) 
+        cell.isBarrier = false;
     }
   }
+}
 
-  function resetSearch() {
-    clearTimeout(undefined);
-    console.log('resetting search...')
-    for (let i = 0; i < grid.length; i++) {
-      for (let j = 0; j < grid[0].length; j++) {
-        clearSearchAttributes(grid[i][j]);
-      }
+function resetSearch() {
+  stopAnimating = true;
+  clearTimeout(undefined);
+  console.log('resetting search...')
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[0].length; j++) {
+      clearSearchAttributes(grid[i][j]);
     }
   }
+}
 
-  function changeAlgorithm(algorithm: Algorithm) {
-    console.log(`Changing algorithm to: ${algorithm}`);
-    searchAlgorithm.value = stringToAlgorithmMap.get(algorithm);
-  }
+function changeAlgorithm(algorithm: Algorithm) {
+  console.log(`Changing algorithm to: ${algorithm}`);
+  searchAlgorithm.value = stringToAlgorithmMap.get(algorithm);
+}
 
 </script>
 
