@@ -194,17 +194,6 @@ function clearGrid(keepBarriers: boolean) {
   }
 }
 
-function resetSearch() {
-  stopAnimating = true;
-  clearTimeout(undefined);
-  console.log('resetting search...')
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[0].length; j++) {
-      clearSearchAttributes(grid[i][j]);
-    }
-  }
-}
-
 function changeAlgorithm(algorithm: Algorithm) {
   console.log(`Changing algorithm to: ${algorithm}`);
   searchAlgorithm.value = stringToAlgorithmMap.get(algorithm);
@@ -229,7 +218,6 @@ function changeAlgorithm(algorithm: Algorithm) {
       <AlgorithmSelect @changeAlgorithm="changeAlgorithm($event)"></AlgorithmSelect>
       <GridOptions 
       @search="handleSearch()" 
-      @resetSearch="resetSearch()" 
       @clearGrid="clearGrid"></GridOptions>
     </div>
   </div>

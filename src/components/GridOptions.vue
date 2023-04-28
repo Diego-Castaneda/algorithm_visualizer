@@ -9,10 +9,6 @@
         keepBarriers = event.currentTarget.checked;
     }
 
-    function resetSearch() {
-      emit('resetSearch');
-    }
-
     function search() {
       emit('search');
     }
@@ -27,7 +23,6 @@
         <h1> Grid Options </h1>
         <div v-for="option in gridOptions" class="grid-option"> {{ option }} </div>
         <button @click="search()"> Search </button>
-        <button @click="resetSearch()"> Reset Search </button>
         <div class="grid-option">
           <button @click="clearGrid()"> Clear Grid </button>
           <input type="checkbox" id="keepBarriers" @change="updateKeepBarriersFlag($event)">
