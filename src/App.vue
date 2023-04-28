@@ -5,48 +5,76 @@ import TheSidebar from "./components/TheSidebar.vue"
 </script>
 
 <template>
-  <div class="app-grid-container">
-    <div class="header"> The Header </div>
-    <div class="sidebar"> 
-      <TheSidebar/>
-    </div>
-    <div class="content"> 
-      <Grid/> 
+  <div class="app-container">
+    <div class="app-content-container">
+      <div class="header"> The header </div>
+      <div class="sidebar"> <TheSidebar/></div>
+      <div class="content"> <Grid/> </div>
+      <div class="footer"> The Footer </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-
-.app-grid-container {
+.app-content-container {
   display: grid;
-  grid-template-rows: 100px 1fr;
+  grid-template-rows: 100px 1fr 100px;
   grid-template-columns: 1fr 5fr;
-  column-gap: 10px;
-  height: 100vh;
+  gap: .25rem;
   width: 100vw;
   background-color: #feefc4;
-  position: absolute;
-  top: 0;
-  left: 0;
+  padding: .25em;
 }
 
 .header {
   grid-column: 1 / span 2;
-  background-color: darkgray;
-  border-radius: 10px;
-  visibility: hidden;
+  grid-row: 1 / span 1;
 }
 
 .sidebar {
-  border: black 1px solid;
   grid-column: 1 / span 1;
-  border-radius: 1em;
+  grid-row: 2 / span 1;
   border: #646cffaa 8px solid;
-  /* background-color: #eee; */
+  border-radius: 3px;
 }
 
 .content {
   grid-column: 2 / span 1;
+  grid-row: 2 / span 1;
 }
+
+.footer {
+  grid-column: 1 / span 2;
+  grid-row: 3;
+}
+/* *, *::before, *::after { box-sizing: border-box }; */
+
+
+@media (max-width: 768px) {
+  .app-content-container {
+    grid-template-rows: 100px 1fr 10fr 100px;
+    grid-template-columns: 1fr;
+  }
+  .header {
+    grid-column: 1;
+    grid-row: 1 / span 1;
+    align-content: center;
+  }
+
+  .sidebar {
+    grid-column: 1;
+    grid-row: 2 / span 1;
+  }
+
+  .content {
+    grid-column: 1;
+    grid-row: 3 / span 1;
+  }
+
+  .footer {
+    grid-column: 1;
+    grid-row: 4 / span 1;
+  }
+}
+
 </style>

@@ -38,10 +38,7 @@
   border-radius: 2px;
   flex-grow: 1;
   vertical-align: center;
-  margin-bottom: 20%;
-  margin-top: 0%;
-  margin-left: 2%;
-  margin-right: 2%;
+  margin: 2em 2em;
 }
 
 .option:hover {
@@ -50,14 +47,14 @@
 }
 
 .algorithm-select {
-  flex-grow: 1;
   border: #513a52 1px solid;
-  border-radius: 12%;
+  border-radius: 10px;
   margin-top: 1%;
   margin-bottom: 1%;
   display: flex;
   flex-direction: column;
   border: #646cffaa 8px solid;
+  padding: .5em .25em;
 }
 
 .selected-algorithm {

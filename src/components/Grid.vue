@@ -192,19 +192,32 @@ function intializeGridWithCells(rows: number, columns: number) {
 <style scoped>
 .container {
   display: flex;
-  width: 100%;
-  height: 95%;
-  position: relative;
-  padding-top: 5px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  .grid-wrapper {
+    grid-column: 1;
+    grid-row: 1 / span 1;
+  }
+
+  .options-pane {
+    grid-column: 1;
+    grid-row: 2 / span 1;
+  }
 }
 
 .grid-wrapper {
   display: grid;
   background-color: #faaa93;
-  width: 40%;
   flex-grow: 1;
   border: #646cffaa 8px solid;
-  border-radius: 2%;
+  border-radius: 3px;
 }
 .grid {
   display: grid;
@@ -215,10 +228,8 @@ function intializeGridWithCells(rows: number, columns: number) {
 .options-pane {
   display: flex;
   flex-direction: column;
-  height: 80%; 
-  width: 20%;
-  padding-left: 1%;
-  padding-right: 1%;
+  padding-left: .25em;
+  padding-right: .25em;
 }
 
 h1 {
@@ -236,7 +247,7 @@ h1 {
   background-color: #fff;
   outline: black 0.1px solid;
   flex-grow: 1;
-  border-radius: 15%;
+  border-radius: 2px;
 }
 
 .clicked-cell {
