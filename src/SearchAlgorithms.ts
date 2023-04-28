@@ -52,8 +52,6 @@ const refresMilliseconds = .0001;
 export function BFS(grid: Cell[][], start: Cell, destination: Cell) {
     console.log("start BFS...");
 
-    // let delayCounter = 0; // This delayCounter to ensure search visualization is incremental (per iteration).
-
     let queue: Cell[] = [start];
     const visited = new Set();
     let current: Cell = start;
@@ -64,24 +62,9 @@ export function BFS(grid: Cell[][], start: Cell, destination: Cell) {
         current = queue.shift()!;
         visited.add(current.id);
 
-        // delayCounter++;
         if (!isSamePosition(current, start) && !isSamePosition(current, destination)) {
             setVisitedWithTimeout(current, true);
             setQueuedWithTimeout(current, false);
-            // await new Promise<void>(resolve => {
-            //     setTimeout(() => {
-            //         current.isVisited = true;
-            //         resolve();
-            //     });
-            // });
-            // await new Promise<void>(resolve => {
-            //     setTimeout(() => {
-            //         current.isQueued = false;
-            //         resolve();
-            //     })
-            // })
-            // setTimeout(setVisited, refresMilliseconds * delayCounter, current)
-            // setTimeout(setQueued, refresMilliseconds * delayCounter, current, false);
         }
 
         for (let neighbor of SquareGrid.getNeighbors(grid, current)) {
@@ -94,14 +77,7 @@ export function BFS(grid: Cell[][], start: Cell, destination: Cell) {
             }
 
             queue.push(neighbor);
-            // setTimeout(setQueued, refresMilliseconds * delayCounter, neighbor, true);
             setQueuedWithTimeout(neighbor, true);
-            // await new Promise<void>(resolve => {
-            //     setTimeout(() => {
-            //         neighbor.isQueued = true;
-            //         resolve();
-            //     })
-            // });
             visited.add(neighbor.id)
         }
     }
